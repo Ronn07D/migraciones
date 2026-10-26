@@ -29,10 +29,7 @@ class Cliente(db.Model):
     email = db.Column(db.String(150), unique=True)
     telefono = db.Column(db.String(20))
 
-    ventas = db.relationship(
-        "Venta",
-        back_populates="cliente"
-    )
+    ventas = db.relationship("Venta",back_populates="cliente")
 
     def __repr__(self):
         return f"<Cliente {self.nombre}>"
@@ -45,11 +42,8 @@ class Producto(db.Model):
     descripcion = db.Column(db.String(255), nullable=False)
     precio = db.Column(db.Numeric(10, 2), nullable=False)
     stock = db.Column(db.Integer, nullable=False, default=0)
-
-    detalles = db.relationship(
-        "DetalleVenta",
-        back_populates="producto"
-    )
+    categoria = db.Column(db.String(50))
+    detalles = db.relationship("DetalleVenta",back_populates="producto")
 
     def __repr__(self):
         return f"<Producto {self.descripcion}>"
@@ -61,28 +55,13 @@ class Venta(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    fecha = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=lambda: datetime.now(timezone.utc)
-    )
+    fecha = db.Column(db.DateTime,nullable=False,default=lambda: datetime.now(timezone.utc))
 
-    cliente_id = db.Column(
-        db.Integer,
-        db.ForeignKey("clientes.id"),
-        nullable=False
-    )
+    cliente_id = db.Column(db.Integer,db.ForeignKey("clientes.id"),nullable=False)
 
-    cliente = db.relationship(
-        "Cliente",
-        back_populates="ventas"
-    )
+    cliente = db.relationship("Cliente",back_populates="ventas")
 
-    detalles = db.relationship(
-        "DetalleVenta",
-        back_populates="venta",
-        cascade="all, delete-orphan"
-    )
+    detalles = db.relationship("DetalleVenta",back_populates="venta",cascade="all, delete-orphan")
 
     @property
     def total(self):
@@ -100,38 +79,17 @@ class DetalleVenta(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    venta_id = db.Column(
-        db.Integer,
-        db.ForeignKey("ventas.id"),
-        nullable=False
-    )
+    venta_id = db.Column(db.Integer,db.ForeignKey("ventas.id"),nullable=False)
 
-    producto_id = db.Column(
-        db.Integer,
-        db.ForeignKey("productos.id"),
-        nullable=False
-    )
+    producto_id = db.Column(db.Integer,db.ForeignKey("productos.id"),nullable=False)
 
-    cantidad = db.Column(
-        db.Integer,
-        nullable=False,
-        default=1
-    )
+    cantidad = db.Column(db.Integer,nullable=False,default=1)
 
-    precio_unitario = db.Column(
-        db.Numeric(10, 2),
-        nullable=False
-    )
+    precio_unitario = db.Column(db.Numeric(10, 2),nullable=False)
 
-    venta = db.relationship(
-        "Venta",
-        back_populates="detalles"
-    )
+    venta = db.relationship("Venta",back_populates="detalles")
 
-    producto = db.relationship(
-        "Producto",
-        back_populates="detalles"
-    )
+    producto = db.relationship("Producto",back_populates="detalles")
 
     def __repr__(self):
         return f"<DetalleVenta {self.id}>"
